@@ -1,0 +1,37 @@
+# Use an official Python runtime as the base image
+FROM python:3.8
+# FROM ubuntu:latest
+# RUN apt-get update && apt-get install -y python3 python3-pip
+# RUN apt-get update && apt-get install -y sudo curl
+
+# Expose default redis poll
+# FROM redis:latest
+# EXPOSE 6379
+
+# Set the working directory inside the container
+WORKDIR /tasks
+
+# RUN cd /tasks
+
+# Copy the requirements file into the container at /app
+COPY tasks/requirement.txt .
+
+# Install any needed packages specified in requirements.txt
+RUN pip install -r requirement.txt
+
+# Install and run redis
+# RUN pip install redis
+# RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+# RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+# RUN apt-get update && apt-get install -y redis-server
+# # RUN apt-get install redis
+# RUN service redis-server start
+
+# Copy celeryconfig
+COPY celeryconfig.py .
+
+# Copy the rest of the application code into the container
+COPY tasks/ tasks/
+
+# Run the Celery worker when the container starts
+CMD ["celery", "-A", "tasks.celery_worker", "worker", "--loglevel=info"]

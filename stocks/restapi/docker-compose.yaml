@@ -1,17 +1,24 @@
 version: '3'
+
 services:
-  flask-app:
-    build: ./app
+  flaskapp:
+    build:
+      context: ./
+      dockerfile: dockerfile.fla
     ports:
       - "5000:5000"
     depends_on:
-      - celery-worker
+      - redis
+      - celeryworker
 
-  celery-worker:
-    build: ./tasks
-    command: celery -A tasks.celery_worker worker --loglevel=info
+  celeryworker:
+    build:
+      context: ./
+      dockerfile: dockerfile.cel
     depends_on:
       - redis
 
   redis:
-    image: "redis:latest"
+    image: redis:latest
+    ports:
+      - "6379:6379"

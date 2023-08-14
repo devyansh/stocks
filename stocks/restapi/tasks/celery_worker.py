@@ -1,18 +1,14 @@
 import requests
-from celery import Celery
-from celeryconfig import celery
+# from celery import Celery
+from celeryconfig import app
 # from app import app
 
-app = Celery(
-    'celery_worker',
-    broker = 'redis://localhost:6379/0',
-    include=['tasks.celery_worker']
-)
-
 FINNHUB_API_KEY = 'cjbbmfpr01qn9c1l9ge0cjbbmfpr01qn9c1l9geg'
+print('CELERY WORKER FILE')
 
 @app.task
 def process_stock_data(stock_symbol, date):
+    print('PROCESS STOCK DATA CALLED')
     url = f"https://finnhub.io/api/v1/stock/candle?symbol={stock_symbol}&resolution=D&from={date}&to={date}&token={FINNHUB_API_KEY}"
     response = requests.get(url)
     
@@ -28,3 +24,8 @@ def process_stock_data(stock_symbol, date):
     print('PROCESSED DATA')
     print(processed_data)
     return processed_data
+
+@app.task
+def test_method(stock_symbol):
+    final_string = stock_symbol
+    return final_string

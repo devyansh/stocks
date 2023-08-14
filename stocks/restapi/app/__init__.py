@@ -3,13 +3,14 @@ from flask import Flask
 from celery import Celery
 from flask import jsonify, request
 from tasks.celery_worker import process_stock_data
+from tasks.celery_worker import test_method
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
 # Celery configuration
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'  # Replace with Redis host
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'  # Replace with Redis host
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'  
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0' 
 
 celery = Celery(
     app.import_name,
@@ -60,9 +61,9 @@ def handle_action(request):
 def normalize_data(date, stock_data_for_date, symbol):
     return {
         'date': date.strftime("%Y/%m/%d, %H:%M:%S"),
-        'close': stock_data_for_date.get("close_price")[0],
-        'open': stock_data_for_date.get("open_price")[0], 
-        'status': stock_data_for_date.get("status"), 
+        'close': stock_data_for_date.get()['close_price'][0],
+        'open': stock_data_for_date.get()['open_price'][0], 
+        'status': stock_data_for_date.get()['status'][0], 
         'symbol': symbol,
     }
 

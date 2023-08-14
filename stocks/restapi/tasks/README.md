@@ -4,13 +4,14 @@
 
 1. Build the Docker container:
 `docker build -t celery-worker .`
+`docker build -f dockerfile.cel -t celery-worker .`
 
 
 2. Run the container:
 `docker run celery-worker`
 
 To run without docker:
-`python -m celery -A celery_worker worker --loglevel=info`
+`python -m celery -A celeryconfig worker --loglevel=info --pool=solo`
 
 
 ## Rationale

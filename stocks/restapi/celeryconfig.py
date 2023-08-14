@@ -2,13 +2,14 @@
 from celery import Celery
 
 # Define the Celery app and its configuration
-celery = Celery(
-    'celery_worker',
+app = Celery(
+    'celeryconfig',
     broker='redis://localhost:6379/0',
+    backend="redis://localhost:6379/0",
     include=['tasks.celery_worker']  # Include the 'tasks.celery_worker' module
 )
 
-# Set Celery configuration options
-celery.conf.update(
-    # Additional configuration options
+# Set the log level to debug
+app.conf.update(
+    CELERYD_LOG_LEVEL='debug'
 )
