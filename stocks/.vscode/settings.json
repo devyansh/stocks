@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "./tasks",
+        "./restapi-api/tasks",
+        "./restapi/tasks"
+    ]
+}
