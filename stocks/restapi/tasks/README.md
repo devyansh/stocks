@@ -9,6 +9,9 @@
 2. Run the container:
 `docker run celery-worker`
 
+To run without docker:
+`python -m celery -A celery_worker worker --loglevel=info`
+
 
 ## Rationale
 

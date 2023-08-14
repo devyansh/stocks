@@ -9,6 +9,9 @@
 2. Run the container:
 `docker run -p 5000:5000 restapi-app`
 
+To run without docker:
+`python -m flask --app __init__ run`
+
 
 ## Rationale
 

@@ -3,6 +3,7 @@ from flask import Flask
 from celery import Celery
 from flask import jsonify, request
 from tasks.celery_worker import process_stock_data
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -20,25 +21,49 @@ celery = Celery(
 def index():
     return 'Hello, World! This is the Flask REST API.'
 
-@app.route('/get_stock_data', methods=['GET'])
+@app.route('/stocks', methods=['GET'])
 def get_stock_data():
+    try:
+        
+        return handle_action(request)
+    except:
+        return {'Error' : 'InternalError'},500
+
+
+@app.route('/stocks', methods=['POST'])
+def post_stock_data():
+    try:
+        return handle_action(request)
+    except:
+        return {'Error' : 'InternalError'},500
+
+def handle_action(request):
     stock_symbol = request.args.get('symbol')
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
 
-    # Replace this with your Celery task call to fetch stock data
-    print('JUST BEFORE PROCESS STOCK')
-    result = process_stock_data(stock_symbol, start_date, end_date)
-    print('YEEEEEEELLLO')
-    print(result)
-    print(type(result))
+    if not end_date_str:
+        end_date_str = start_date_str
 
-    final_result = {
-        'symbol': stock_symbol,
-        'start_date': start_date,
-        'end_date': end_date,
-        'open': result.get('open_prices')[0],
-        'close': result.get('close_prices')[0]
+    formatted_start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+    formatted_end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+
+    final_list = []
+    while formatted_start_date <= formatted_end_date:
+        stock_data_for_date = process_stock_data.delay(stock_symbol, round(formatted_start_date.timestamp()))
+        normalized_data = normalize_data(formatted_start_date, stock_data_for_date, stock_symbol)
+        final_list.append(normalized_data)
+        formatted_start_date += timedelta(days=1)
+    return final_list
+
+
+def normalize_data(date, stock_data_for_date, symbol):
+    return {
+        'date': date.strftime("%Y/%m/%d, %H:%M:%S"),
+        'close': stock_data_for_date.get("close_price")[0],
+        'open': stock_data_for_date.get("open_price")[0], 
+        'status': stock_data_for_date.get("status"), 
+        'symbol': symbol,
     }
 
-    return jsonify(final_result)
+

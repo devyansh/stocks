@@ -1,0 +1,17 @@
+version: '3'
+services:
+  flask-app:
+    build: ./app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - celery-worker
+
+  celery-worker:
+    build: ./tasks
+    command: celery -A tasks.celery_worker worker --loglevel=info
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:latest"
