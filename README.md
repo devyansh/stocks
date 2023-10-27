@@ -1,5 +1,3 @@
-Adobe Assesment
-
 We are running 2 Docker container for backend in Flask and Celery worker.
 
 Follow following steps to run the project:
